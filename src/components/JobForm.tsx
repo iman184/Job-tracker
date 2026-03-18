@@ -15,7 +15,11 @@ const JobForm = ({ setJobs }: JobFormProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
       
-    const newJob: Job = { title, company, status };
+    const newJob: Job = { 
+      id: crypto.randomUUID(),
+      title, 
+      company, 
+      status };
     setJobs(prev => [...prev, newJob]);
    // Reset the form field
     setTitle("");

@@ -1,17 +1,32 @@
-import  { useState } from "react";
+import { useState, useEffect } from "react";
 import JobForm from "./components/JobForm";
-import type { Job } from "./types/Job"
+import JobList from "./components/JobList";
+import type { Job } from "./types/Job";
 
 const App = () => {
-  const [jobs, setJobs] = useState<Job[]>([]);
+  // Initialize state from localStorage
+  const [jobs, setJobs] = useState<Job[]>(() => {
+    const stored = localStorage.getItem("jobs");
+    console.log("Loaded jobs from localStorage:", stored);
+    return stored ? JSON.parse(stored) : [];
+  });
 
-  // Log jobs whenever they change
-  console.log("Jobs state:", jobs);
+  // Save jobs whenever they change
+  useEffect(() => {
+    console.log("Saving jobs to localStorage:", jobs);
+    localStorage.setItem("jobs", JSON.stringify(jobs));
+  }, [jobs]);
+
+  // Delete job by id
+  const handleDelete = (id: string) => {
+    setJobs(prev => prev.filter(job => job.id !== id));
+  };
 
   return (
-    <div>
+    <div style={{ maxWidth: "500px", margin: "0 auto" }}>
       <h1>Job Tracker</h1>
       <JobForm setJobs={setJobs} />
+      <JobList jobs={jobs} onDelete={handleDelete} />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 export interface Job{
+    id: string;
     title: string;
     company: string;
-    status:"Applied" | "Interiew" | "Rejected" | "Offer" ;
+    status:"Applied" | "Interview" | "Rejected" | "Offer" ;
 }
