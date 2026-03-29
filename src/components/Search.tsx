@@ -8,6 +8,7 @@ const Search = ({ searchTerm, onSearchChange }: SearchProps) => {
     <div className="search-bar">
       <input
         type="text"
+        name="search"
         placeholder="Search by title or company..."
         value={searchTerm}
         onChange={e => onSearchChange(e.target.value)}

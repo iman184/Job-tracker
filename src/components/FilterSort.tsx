@@ -15,6 +15,7 @@ const FilterSort = ({ selectedStatuses, onStatusChange, sortBy, onSortChange }: 
       {STATUSES.map(status => (
         <label key={status}>
           <input
+           name="checkbox"
             type="checkbox"
             checked={selectedStatuses.has(status)}
             onChange={e => onStatusChange(status, e.target.checked)}
@@ -24,6 +25,7 @@ const FilterSort = ({ selectedStatuses, onStatusChange, sortBy, onSortChange }: 
       ))}
 
       <select
+      name="sort"
         value={sortBy}
         onChange={e => onSortChange(e.target.value as "status" | "title" | "date")}
         style={{ marginLeft: "auto" }}

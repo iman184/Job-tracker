@@ -66,11 +66,11 @@ const JobForm = ({ setJobs, editingJob, onUpdate, onCancel }: JobFormProps) => {
           <div className="fg-row">
             <div className="fg">
               <label>Role *</label>
-              <input type="text" placeholder="e.g. Product Designer" value={title} onChange={e => setTitle(e.target.value)} required />
+              <input type="text" name="role" placeholder="e.g. Product Designer" value={title} onChange={e => setTitle(e.target.value)} required />
             </div>
             <div className="fg">
               <label>Company *</label>
-              <input type="text" placeholder="e.g. Notion" value={company} onChange={e => setCompany(e.target.value)} required />
+              <input type="text" name="company" placeholder="e.g. Notion" value={company} onChange={e => setCompany(e.target.value)} required />
             </div>
           </div>
 
@@ -86,24 +86,24 @@ const JobForm = ({ setJobs, editingJob, onUpdate, onCancel }: JobFormProps) => {
             </div>
             <div className="fg">
               <label>Location</label>
-              <input type="text" placeholder="Remote, NYC..." value={location} onChange={e => setLocation(e.target.value)} />
+              <input type="text" name="lacation" placeholder="Remote, NYC..." value={location} onChange={e => setLocation(e.target.value)} />
             </div>
           </div>
 
           <div className="fg-row">
             <div className="fg">
               <label>Salary</label>
-              <input type="text" placeholder="$80k–$100k" value={salary} onChange={e => setSalary(e.target.value)} />
+              <input type="text" name="salary" placeholder="$80k–$100k" value={salary} onChange={e => setSalary(e.target.value)} />
             </div>
             <div className="fg">
               <label>Contact</label>
-              <input type="text" placeholder="Contact person" value={contactPerson} onChange={e => setContactPerson(e.target.value)} />
+              <input type="text" name="contact" placeholder="Contact person" value={contactPerson} onChange={e => setContactPerson(e.target.value)} />
             </div>
           </div>
 
           <div className="fg">
             <label>Job Link</label>
-            <input type="url" placeholder="https://..." value={jobLink} onChange={e => setJobLink(e.target.value)} />
+            <input type="url" name="job-link" placeholder="https://..." value={jobLink} onChange={e => setJobLink(e.target.value)} />
           </div>
 
           <div className="fg">
