@@ -1,0 +1,25 @@
+/* Container for the job cards */
+.jobList {
+  display: grid;
+  grid-template-columns: 1fr; /* single column on mobile */
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Responsive for larger screens */
+@media (min-width: 600px) {
+  .jobList {
+    grid-template-columns: 1fr 1fr; /* two columns on desktop */
+  }
+}
+
+/* Empty state styling */
+.empty {
+  text-align: center;
+  font-size: 1rem;
+  color: #777;
+  padding: 20px;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
