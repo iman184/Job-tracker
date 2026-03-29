@@ -1,36 +1,30 @@
 import type { Job } from "../types/Job";
 
-type StatisticsProps = {
-  jobs: Job[];
-};
+type StatisticsProps = { jobs: Job[] };
 
 const Statistics = ({ jobs }: StatisticsProps) => {
+  const total = jobs.length || 1;
   const counts = {
-    Applied: jobs.filter(j => j.status === "Applied").length,
+    Applied:   jobs.filter(j => j.status === "Applied").length,
     Interview: jobs.filter(j => j.status === "Interview").length,
-    Offer: jobs.filter(j => j.status === "Offer").length,
-    Rejected: jobs.filter(j => j.status === "Rejected").length,
+    Offer:     jobs.filter(j => j.status === "Offer").length,
+    Rejected:  jobs.filter(j => j.status === "Rejected").length,
   };
 
   return (
-    <div style={{
-      display: "flex",
-      gap: "15px",
-      marginBottom: "20px",
-      flexWrap: "wrap",
-      justifyContent: "center"
-    }}>
-      <div style={{ padding: "10px 15px", backgroundColor: "#e8f4f8", borderRadius: "6px", border: "1px solid #b3d9e8" }}>
-        <strong style={{ color: "#0066cc" }}>Applied:</strong> {counts.Applied}
+    <div className="progress-bar-wrap">
+      <div className="prog-label">pipeline</div>
+      <div className="prog-track">
+        <div className="prog-seg" style={{ background: "#3b82f6", width: `${Math.round(counts.Applied   / total * 100)}%` }} />
+        <div className="prog-seg" style={{ background: "#f59e0b", width: `${Math.round(counts.Interview / total * 100)}%` }} />
+        <div className="prog-seg" style={{ background: "#22c55e", width: `${Math.round(counts.Offer     / total * 100)}%` }} />
+        <div className="prog-seg" style={{ background: "#ef4444", width: `${Math.round(counts.Rejected  / total * 100)}%` }} />
       </div>
-      <div style={{ padding: "10px 15px", backgroundColor: "#fff4e6", borderRadius: "6px", border: "1px solid #ffd699" }}>
-        <strong style={{ color: "#ff9900" }}>Interview:</strong> {counts.Interview}
-      </div>
-      <div style={{ padding: "10px 15px", backgroundColor: "#e6f9e6", borderRadius: "6px", border: "1px solid #99dd99" }}>
-        <strong style={{ color: "#00aa00" }}>Offer:</strong> {counts.Offer}
-      </div>
-      <div style={{ padding: "10px 15px", backgroundColor: "#ffe6e6", borderRadius: "6px", border: "1px solid #ff9999" }}>
-        <strong style={{ color: "#cc0000" }}>Rejected:</strong> {counts.Rejected}
+      <div className="prog-legend">
+        <div className="prog-item"><div className="prog-dot" style={{ background: "#3b82f6" }} /><span>{counts.Applied} applied</span></div>
+        <div className="prog-item"><div className="prog-dot" style={{ background: "#f59e0b" }} /><span>{counts.Interview} interview</span></div>
+        <div className="prog-item"><div className="prog-dot" style={{ background: "#22c55e" }} /><span>{counts.Offer} offer</span></div>
+        <div className="prog-item"><div className="prog-dot" style={{ background: "#ef4444" }} /><span>{counts.Rejected} rejected</span></div>
       </div>
     </div>
   );

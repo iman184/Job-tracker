@@ -9,15 +9,15 @@ type JobListProps = {
 
 const JobList = ({ jobs, onDelete, onEdit }: JobListProps) => {
   if (jobs.length === 0) {
-    return <p style={{ textAlign: "center", color: "#999" }}>No jobs found.</p>;
+    return <div className="empty-col">No applications yet</div>;
   }
 
   return (
-    <div>
-      {jobs.map((job) => (
-       <JobCard key={job.id} job={job} onDelete={onDelete} onEdit={onEdit} onDeleteClick={onDelete} />
+    <>
+      {jobs.map(job => (
+        <JobCard key={job.id} job={job} onDelete={onDelete} onEdit={onEdit} onDeleteClick={onDelete} />
       ))}
-    </div>
+    </>
   );
 };
 

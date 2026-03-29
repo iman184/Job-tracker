@@ -8,11 +8,26 @@ import Modal from "./components/Modal";
 import ConfirmDelete from "./components/ConfirmDelete";
 import type { Job } from "./types/Job";
 
+// logo colour palette (same as reference)
+const LOGO_COLORS: [string, string][] = [
+  ["#dbeafe", "#1e3a5f"],
+  ["#ede9fe", "#3730a3"],
+  ["#dcfce7", "#14532d"],
+  ["#fef3c7", "#78350f"],
+  ["#fce7f3", "#831843"],
+  ["#e0f2fe", "#0c4a6e"],
+];
+export function getLogoColors(company: string): [string, string] {
+  const h = company.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  return LOGO_COLORS[h % LOGO_COLORS.length];
+}
+
+export type Status = Job["status"];
+export const STATUSES: Status[] = ["Applied", "Interview", "Offer", "Rejected"];
+
 const App = () => {
-  // Initialize state from localStorage
-    const [jobs, setJobs] = useState<Job[]>(() => {
+  const [jobs, setJobs] = useState<Job[]>(() => {
     const stored = localStorage.getItem("jobs");
-    console.log("Loaded jobs from localStorage:", stored);
     return stored ? JSON.parse(stored) : [];
   });
 
@@ -27,13 +42,10 @@ const App = () => {
   const [deleteJobTitle, setDeleteJobTitle] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  // Save jobs whenever they change
   useEffect(() => {
-    console.log("Saving jobs to localStorage:", jobs);
     localStorage.setItem("jobs", JSON.stringify(jobs));
   }, [jobs]);
 
-  // Delete job by id
   const handleDelete = (id: string) => {
     setJobs(prev => prev.filter(job => job.id !== id));
     setIsDeleteModalOpen(false);
@@ -41,7 +53,6 @@ const App = () => {
     setDeleteJobTitle("");
   };
 
-  // Show delete confirmation
   const handleDeleteClick = (id: string) => {
     const job = jobs.find(j => j.id === id);
     if (job) {
@@ -51,102 +62,123 @@ const App = () => {
     }
   };
 
-  // Confirm delete
   const handleConfirmDelete = () => {
-    if (deleteJobId) {
-      handleDelete(deleteJobId);
-    }
+    if (deleteJobId) handleDelete(deleteJobId);
   };
 
-  // Edit job
   const handleEdit = (job: Job) => {
     setEditingJob(job);
     setIsModalOpen(true);
   };
 
-  // Update job
   const handleUpdate = (updatedJob: Job) => {
     setJobs(prev => prev.map(job => job.id === updatedJob.id ? updatedJob : job));
     setIsModalOpen(false);
     setEditingJob(null);
   };
 
-  // Close modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingJob(null);
   };
 
-  // Handle status filter change
   const handleStatusChange = (status: Job["status"], isChecked: boolean) => {
     const newStatuses = new Set(selectedStatuses);
-    if (isChecked) {
-      newStatuses.add(status);
-    } else {
-      newStatuses.delete(status);
-    }
+    if (isChecked) newStatuses.add(status);
+    else newStatuses.delete(status);
     setSelectedStatuses(newStatuses);
   };
 
-  // Filter and sort jobs
   const filteredAndSortedJobs = jobs
     .filter(job => selectedStatuses.has(job.status))
     .filter(job => {
-      const searchLower = searchTerm.toLowerCase();
-      return job.title.toLowerCase().includes(searchLower) || 
-             job.company.toLowerCase().includes(searchLower);
+      const q = searchTerm.toLowerCase();
+      return job.title.toLowerCase().includes(q) || job.company.toLowerCase().includes(q);
     })
     .sort((a, b) => {
-      if (sortBy === "title") {
-        return a.title.localeCompare(b.title);
-      } else if (sortBy === "status") {
-        const statusOrder: Record<Job["status"], number> = {
-          "Applied": 1,
-          "Interview": 2,
-          "Offer": 3,
-          "Rejected": 4
-        };
-        return statusOrder[a.status] - statusOrder[b.status];
-      } else {
-        // Sort by date (newest first)
-        return new Date(b.dateApplied).getTime() - new Date(a.dateApplied).getTime();
+      if (sortBy === "title") return a.title.localeCompare(b.title);
+      if (sortBy === "status") {
+        const order: Record<Job["status"], number> = { Applied: 1, Interview: 2, Offer: 3, Rejected: 4 };
+        return order[a.status] - order[b.status];
       }
+      return new Date(b.dateApplied).getTime() - new Date(a.dateApplied).getTime();
     });
 
   return (
-    <div style={{ maxWidth: "700px", margin: "0 auto", padding: "20px" }}>
-      <h1 style={{ textAlign: "center" }}>Job Tracker</h1>
-      <JobForm setJobs={setJobs} />
-      
+    <div className="shell">
+
+      {/* ── topbar ── */}
+      <div className="topbar">
+        <div className="brand">
+          <span className="brand-bracket">[</span>jb<span className="brand-bracket">]</span> JobTracker
+        </div>
+
+        {/* no view toggle — keeping original single-view layout */}
+        <div className="topbar-center" />
+
+        <div className="topbar-right">
+          <button className="add-btn" onClick={() => { setEditingJob(null); setIsModalOpen(true); }}>
+            + Add
+          </button>
+        </div>
+      </div>
+
+      {/* ── pipeline bar (Statistics) ── */}
       <Statistics jobs={jobs} />
-      
+
+      {/* ── search ── */}
       <Search searchTerm={searchTerm} onSearchChange={setSearchTerm} />
-      
-      <FilterSort 
+
+      {/* ── filters ── */}
+      <FilterSort
         selectedStatuses={selectedStatuses}
         onStatusChange={handleStatusChange}
         sortBy={sortBy}
         onSortChange={setSortBy}
       />
-      
-      <JobList 
-        jobs={filteredAndSortedJobs} 
-        onDelete={handleDeleteClick} 
-        onEdit={handleEdit} 
-      />
-      
+
+      {/* ── kanban board ── */}
+      <div className="kanban-wrap">
+        {STATUSES.map(status => {
+          const colJobs = filteredAndSortedJobs.filter(j => j.status === status);
+          return (
+            <div key={status} className={`kanban-col col-${status.toLowerCase()}`}>
+              <div className="col-header">
+                <div className="col-title">
+                  <span className="col-title-dot" />
+                  {status}
+                </div>
+                <div className="col-count">{colJobs.length}</div>
+              </div>
+              <div className="cards-list">
+                <JobList jobs={colJobs} onDelete={handleDeleteClick} onEdit={handleEdit} />
+              </div>
+              <button
+                className="col-add-btn"
+                onClick={() => {
+                  setEditingJob({ id: "", title: "", company: "", status, dateApplied: new Date().toISOString().split("T")[0] } as Job);
+                  setIsModalOpen(true);
+                }}
+              >
+                + Add card
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── edit/add modal ── */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-        {editingJob && (
-          <JobForm 
-            setJobs={setJobs} 
-            editingJob={editingJob}
-            onUpdate={handleUpdate}
-            onCancel={handleCloseModal}
-          />
-        )}
+        <JobForm
+          setJobs={setJobs}
+          editingJob={editingJob ?? undefined}
+          onUpdate={handleUpdate}
+          onCancel={handleCloseModal}
+        />
       </Modal>
 
-      <ConfirmDelete 
+      {/* ── confirm delete ── */}
+      <ConfirmDelete
         isOpen={isDeleteModalOpen}
         jobTitle={deleteJobTitle}
         onConfirm={handleConfirmDelete}
